@@ -100,9 +100,8 @@ select
 from books 
 where isbn in ( 
                  select 
-			       distinct issued_book_isbn 
-				 from
-				    issued_status )
+                 distinct issued_book_isbn 
+                 from issued_status )
 group by
     category
 order by 
@@ -140,4 +139,51 @@ from employees e
 join issued_status Iss on e.emp_id=Iss.issued_emp_id
 group by  e.emp_name
 order by Num_of_issued_books desc ;
+```
+- List Members Who Have Issued More Than Once
+``` sql
+select
+    m.member_name, 
+	count(Iss.issued_id) Number_of_issues
+from members m 
+join issued_status Iss  on m.member_id=Iss.issued_member_id
+group by 
+     m.member_name
+having 
+      count(Iss.issued_id)> 1
+order by
+      Number_of_issues desc;
+```
+- List Members Who Registered in the Last 180 Days
+```sql
+select 
+     member_name,
+	 reg_date
+from members
+-- members who registered in the last 180 days from the last date in the data
+where reg_date > DATEADD(day,-180,
+                  (select 
+                        top 1 reg_date 
+                        from members 
+                        order by reg_date desc) ) 
+-- members who registered in the last 180 days from today 
+--where reg_date>= DATEADD(day,-180, GETDATE())
+order by  reg_date desc;
+```
+- Branch Performance Report
+```sql
+create view branch_berformance
+as 
+select 
+    b.branch_id , 
+	count(distinct e.emp_id) NumOfEmployees,
+	count(distinct bo.isbn) NumOfBooks,
+	count(Iss.issued_book_isbn) NumOfBooksIssued,
+	sum(bo.rental_price) TotalRevenueGenerated 
+from
+    branch b 
+join employees e on b.branch_id=e.branch_id
+left join issued_status Iss on Iss.issued_emp_id=e.emp_id
+left join books bo on Iss.issued_book_isbn=bo.isbn
+group by  b.branch_id ;
 ```
