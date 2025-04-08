@@ -1,8 +1,12 @@
 # Library performane analysis
-# database schema 
+# Objectives 
+- Create database
+- Insert data from csv files into database
+- Write SQL queries to analyze library performance
+# database schema
  ![database schema ](https://github.com/Saragamil3/Laybrary_performance_analysis/blob/main/Screenshot%202025-04-08%20090728.png)
 # create database 
-Created tables for branches, employees, members, books, issued status, and return status
+- Created tables for branches, employees, members, books, issued status, and return status
 
 ```sql
 CREATE DATABASE LIBRARY;
@@ -50,5 +54,18 @@ issued_book_name VARCHAR(50),
 issued_date DATE ,
 issued_book_isbn VARCHAR(50) FOREIGN KEY REFERENCES books(isbn),
 issued_emp_id    VARCHAR(10) FOREIGN KEY REFERENCES employees(emp_id)
+);
+```
+- insert data from csv files into each table in the database
+```sql
+--insert data from csv files into each table in the database
+BULK INSERT dbo.books
+from 'D:\Ai\DA Projects\library project\books.csv'  
+WITH (
+    FORMAT = 'CSV',  -- Only available in SQL Server 2017+
+    FIRSTROW = 2,  -- Skip header row
+    FIELDTERMINATOR = ',',  -- CSV uses comma as delimiter
+    ROWTERMINATOR = '\n',  -- New line for each record
+    TABLOCK
 );
 ```
