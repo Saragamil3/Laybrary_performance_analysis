@@ -69,7 +69,7 @@ WITH (
     TABLOCK
 );
 ```
-#Write SQL queries to analyze library performance
+# Write SQL queries to analyze library performance
 - Retrieve All Books in a Specific Categories
 ```sql
 select 
@@ -172,7 +172,7 @@ order by  reg_date desc;
 ```
 - Branch Performance Report
 ```sql
-create view branch_berformance
+create view branch_performance
 as 
 select 
     b.branch_id , 
