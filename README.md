@@ -1,6 +1,6 @@
 # Library performane analysis
 # Objectives 
-- Create database
+- Create database using ms sql server
 - Insert data from csv files into database
 - Write SQL queries to analyze library performance
 # database schema
@@ -68,4 +68,76 @@ WITH (
     ROWTERMINATOR = '\n',  -- New line for each record
     TABLOCK
 );
+```
+#Write SQL queries to analyze library performance
+- Retrieve All Books in a Specific Categories
+```sql
+select 
+   category,
+   book_title
+from 
+    books 
+where 
+    category in ('Children', 'Classic')
+```
+- Number of issued books for each category
+```sql
+select 
+   b.category,
+   count(distinct Iss.issued_book_isbn) Number_of_issued_books
+from dbo.issued_status Iss 
+right join dbo.books b on b.isbn=Iss.issued_book_isbn
+group by 
+   b.category
+order by
+   Number_of_issued_books desc ;
+```
+-Total Rental Income by Category for issued books
+```sql
+select 
+   category,
+   sum(rental_price) Total_Rental_Income
+from books 
+where isbn in ( 
+                 select 
+			       distinct issued_book_isbn 
+				 from
+				    issued_status )
+group by
+    category
+order by 
+    Total_Rental_Income desc ; 
+```
+- List of issued and non issued books
+```sql
+-- issued books
+select 
+    b.book_title
+from dbo.issued_status Iss  join dbo.books b
+on b.isbn = Iss.issued_book_isbn 
+
+-- not issued books
+select 
+    b.book_title
+from books b
+where b.isbn not in (select distinct issued_book_isbn from issued_status )
+```
+- List Employees with Their branch details
+```sql
+select 
+   e.emp_name,
+   b.branch_address,
+   b.contact_no
+from employees e  
+join branch b on e.branch_id=b.branch_id ;
+```
+- Employees with the Most Book Issues Processed
+```sql
+select 
+     top 5 e.emp_name,
+	 count(distinct Iss.issued_book_isbn) Num_of_issued_books
+from employees e  
+join issued_status Iss on e.emp_id=Iss.issued_emp_id
+group by  e.emp_name
+order by Num_of_issued_books desc ;
 ```
